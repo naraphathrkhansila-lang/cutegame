@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cat Jump Game</title>
+<style>
+    body {
+        margin: 0;
+        font-family: "Comic Sans MS", Arial, sans-serif;
+        background: linear-gradient(#ffb6c1, #87cefa, #fffacd);
+        text-align: center;
+    }
+    h1, h2 {
+        color: #ff69b4;
+        text-shadow: 2px 2px #fff;
+    }
+    canvas {
+        background: linear-gradient(#87cefa, #fffacd);
+        display: none;
+        margin: auto;
+        border: 5px dashed #ff69b4;
+        border-radius: 20px;
+    }
+    .menu {
+        margin-top: 130px;
+    }
+    button {
+        display: block;
+        margin: 15px auto;
+        padding: 14px 35px;
+        font-size: 20px;
+        border: none;
+        border-radius: 30px;
+        background: #ff9acb;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 5px #ff69b4;
+    }
+    button:hover {
+        background: #ffd700;
+        color: #ff1493;
+    }
+</style>
+</head>
+<body>
+
+<div class="menu" id="menu">
+    <h1>🐱✨ Cat Jump Game ✨🐟</h1>
+    <button onclick="startGame()">🎮 Start Game</button>
+    <button onclick="showCredits()">📖 Credits</button>
+    <button onclick="exitGame()">❌ Exit</button>
+</div>
+
+<div class="menu" id="credits" style="display:none;">
+    <h2>💖 ผู้จัดทำ 💖</h2>
+    <p>เด็กหญิงนาราภัทร ขันศฺลา</p>
+    <p>ชั้น ม.2/2 เลขที่ 20</p>
+    <button onclick="backMenu()">⬅ Back</button>
+</div>
+
+<canvas id="game" width="600" height="400"></canvas>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let cat = { x: 280, y: 320, vy: 0, jump: false };
+let items = [];
+let score = 0;
+let loop;
+
+function startGame() {
+    menu.style.display = "none";
+    credits.style.display = "none";
+    canvas.style.display = "block";
+    score = 0;
+    items = [];
+    loop = setInterval(update, 20);
+}
+
+function showCredits() {
+    menu.style.display = "none";
+    credits.style.display = "block";
+}
+
+function backMenu() {
+    credits.style.display = "none";
+    menu.style.display = "block";
+}
+
+function exitGame() {
+    alert("ขอบคุณที่เล่นเกมนะคะ 💕🐱");
+}
+
+document.addEventListener("keydown", e => {
+    if (e.key === "ArrowLeft") cat.x -= 20;
+    if (e.key === "ArrowRight") cat.x += 20;
+    if (e.key === " " && !cat.jump) {
+        cat.vy = -13;
+        cat.jump = true;
+    }
+});
+
+function spawnItem() {
+    items.push({
+        x: Math.random() * 560,
+        y: 0,
+        type: Math.random() > 0.5 ? "🐟" : "⭐"
+    });
+}
+
+function update() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // แมว
+    cat.y += cat.vy;
+    cat.vy += 0.6;
+    if (cat.y >= 320) {
+        cat.y = 320;
+        cat.jump = false;
+    }
+    ctx.font = "40px Arial";
+    ctx.fillText("🐱", cat.x, cat.y);
+
+    // ของตก
+    if (Math.random() < 0.03) spawnItem();
+    items.forEach((item, i) => {
+        item.y += 4;
+        ctx.font = "28px Arial";
+        ctx.fillText(item.type, item.x, item.y);
+
+        if (
+            item.x > cat.x &&
+            item.x < cat.x + 30 &&
+            item.y > cat.y - 30 &&
+            item.y < cat.y
+        ) {
+            score++;
+            items.splice(i, 1);
+        }
+    });
+
+    ctx.fillStyle = "#ff1493";
+    ctx.font = "20px Comic Sans MS";
+    ctx.fillText("💗 Score: " + score, 20, 30);
+}
+</script>
+
+</body>
+</html>
